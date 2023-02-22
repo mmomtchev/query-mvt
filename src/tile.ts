@@ -3,6 +3,7 @@ import Protobuf from 'pbf';
 import fetch from 'node-fetch';
 import * as turf from '@turf/turf';
 import proj4 from 'proj4';
+import { Queue } from 'async-await-queue';
 
 import { MVTMetadata } from './metadata';
 import { debug } from './debug.js';
@@ -15,7 +16,7 @@ declare module '@mapbox/vector-tile' {
 
 export function resolveTile(opts: {
   coords: [number, number],
-  metadata: MVTMetadata
+  metadata: MVTMetadata;
 }): [number, number] {
   const tiles = 2 ** opts.metadata.maxzoom;
   const tileSize = opts.metadata.tile_dimension_zoom_0 / tiles;
@@ -27,7 +28,7 @@ export function resolveTile(opts: {
 
 export function originTile(opts: {
   coords: [number, number],
-  metadata: MVTMetadata
+  metadata: MVTMetadata;
 }): [number, number] {
   const tiles = 2 ** opts.metadata.maxzoom;
   const tileSize = opts.metadata.tile_dimension_zoom_0 / tiles;
@@ -55,11 +56,11 @@ function getTileFeatures(tile: VectorTile, opts: {
 }): turf.Feature[] {
   const features: turf.Feature[] = [];
   const xform = proj4(opts.metadata.crs, 'EPSG:4326');
-  
+
   const project = ([x, y]: [number, number]) => xform.forward([
-      x * opts.metadata.tile_dimension_zoom_0 + opts.metadata.tile_origin_upper_left_x,
-      opts.metadata.tile_origin_upper_left_y - y * opts.metadata.tile_dimension_zoom_0
-    ]) as [number, number];
+    x * opts.metadata.tile_dimension_zoom_0 + opts.metadata.tile_origin_upper_left_x,
+    opts.metadata.tile_origin_upper_left_y - y * opts.metadata.tile_dimension_zoom_0
+  ]) as [number, number];
 
   for (const layerName of Object.keys(tile.layers)) {
     const l = tile.layers[layerName];
@@ -77,15 +78,17 @@ export function retrieveTile(opts: {
   url: string;
   coords: [number, number];
   metadata: MVTMetadata;
+  queue: Queue;
 }): Promise<turf.Feature[]> {
   const url = resolveUrl({ url: opts.url, coords: opts.coords, zoom: opts.metadata.maxzoom });
   debug(`Retrieving ${url}`);
   return new Promise((resolve, reject) =>
-    fetch(url, {
-      headers: {
-        'accept-encoding': 'gzip,deflate'
-      }
-    })
+    opts.queue.run(() =>
+      fetch(url, {
+        headers: {
+          'accept-encoding': 'gzip,deflate'
+        }
+      }))
       .then((data) => {
         if (!data.ok) {
           throw new Error(`${url}: HTTP ${data.status} ${data.statusText}`);
@@ -95,7 +98,7 @@ export function retrieveTile(opts: {
       .then((data) => data.arrayBuffer())
       .then((data) => {
         const tile = new VectorTile(new Protobuf(data));
-        const features = getTileFeatures(tile, {coords: opts.coords, metadata: opts.metadata});
+        const features = getTileFeatures(tile, { coords: opts.coords, metadata: opts.metadata });
         debug(`${url} contains ${features.length} features`);
         resolve(features);
       })
@@ -108,6 +111,7 @@ export function retrieveNeighboringTiles(opts: {
   coords: [number, number];
   metadata: MVTMetadata;
   distance: number;
+  queue: Queue;
 }): Promise<turf.Feature[]> {
 
   const tiles = [] as Promise<turf.Feature[]>[];
@@ -122,7 +126,12 @@ export function retrieveNeighboringTiles(opts: {
 
     for (const coords of tileCoords) {
       if (coords[0] >= 0)
-        tiles.push(retrieveTile({ url: opts.url, coords: coords, metadata: opts.metadata }).catch(() => [] as turf.Feature[]));
+        tiles.push(retrieveTile({
+          url: opts.url,
+          coords: coords,
+          metadata: opts.metadata,
+          queue: opts.queue
+        }).catch(() => [] as turf.Feature[]));
     }
   }
 

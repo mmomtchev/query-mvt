@@ -1,6 +1,8 @@
 import proj4 from 'proj4';
 import fetch from 'node-fetch';
 import * as turf from '@turf/turf';
+import { Queue } from 'async-await-queue';
+export { Queue } from 'async-await-queue';
 
 import { MVTMetadata } from './metadata';
 import { resolveTile, retrieveNeighboringTiles, retrieveTile } from './tile.js';
@@ -15,12 +17,13 @@ export async function acquire(url: string): Promise<MVTMetadata> {
 }
 
 /**
- * 
  * @param {Record<string, any>} opts options
  * @param {string} opts.url Openlayers-style URL template for requesting tiles, must contain {x}, {y} and {z}
  * @param {MVTMetadata} [opts.metadata] optional GDAL-style metadata.json, may be empty for world-wide EPSG:3857 tilesets
- * @param {lon} opts.lon longitude
- * @param {lat} opts.lat latitude
+ * @param {number} opts.lon longitude
+ * @param {number} opts.lat latitude
+ * @param {Queue} opts.queue optional shared Queue to be used for limiting concurrency, @default Queue(8,0)
+ * @param {number} opts.maxFeature optional number of features to return, @default 1
  * @returns {turf.Feature}
  */
 export async function search(opts: {
@@ -30,7 +33,7 @@ export async function search(opts: {
   lat: number;
   maxRadius?: number;
   maxFeatures?: number;
-  maxParallel?: number;
+  queue?: Queue;
 }) {
   const metadata: MVTMetadata = {
     tile_origin_upper_left_x: opts.metadata?.tile_origin_upper_left_x ?? -20037508.34,
@@ -50,10 +53,11 @@ export async function search(opts: {
     f: null as turf.Feature | null
   };
   let distance = 1;
+  const queue = opts.queue ?? new Queue(8, 0);
   do {
     const features: turf.Feature[] = await Promise.all([
-      distance == 1 ? retrieveTile({ coords: tileCoords, metadata: metadata, url: opts.url }).catch(() => []) : [],
-      retrieveNeighboringTiles({ coords: tileCoords, metadata: metadata, url: opts.url, distance })
+      distance == 1 ? retrieveTile({ coords: tileCoords, metadata: metadata, url: opts.url, queue }).catch(() => []) : [],
+      retrieveNeighboringTiles({ coords: tileCoords, metadata: metadata, url: opts.url, distance, queue })
     ]).then(([first, next]) => [...first, ...next]);
 
     for (const f of features) {
