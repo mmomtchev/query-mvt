@@ -61,8 +61,7 @@ describe('should search for features', () => {
     search({
       url: 'https://www.qwant.com/maps/tiles/ozbasemap/{z}/{x}/{y}.pbf',
       lon: 2.35586,
-      lat: 48.83115,
-      metadata: { maxzoom: 12 }
+      lat: 48.83115
     })
       .then((result) => {
         assert.strictEqual(result.feature.properties['class'], 'service');

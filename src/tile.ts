@@ -4,7 +4,7 @@ import fetch from 'node-fetch';
 import * as turf from '@turf/turf';
 import proj4 from 'proj4';
 
-import { mvtMetadata } from './metadata';
+import { MVTMetadata } from './metadata';
 import { debug } from './debug.js';
 
 declare module '@mapbox/vector-tile' {
@@ -15,7 +15,7 @@ declare module '@mapbox/vector-tile' {
 
 export function resolveTile(opts: {
   coords: [number, number],
-  metadata: mvtMetadata
+  metadata: MVTMetadata
 }): [number, number] {
   const tiles = 2 ** opts.metadata.maxzoom;
   const tileSize = opts.metadata.tile_dimension_zoom_0 / tiles;
@@ -27,7 +27,7 @@ export function resolveTile(opts: {
 
 export function originTile(opts: {
   coords: [number, number],
-  metadata: mvtMetadata
+  metadata: MVTMetadata
 }): [number, number] {
   const tiles = 2 ** opts.metadata.maxzoom;
   const tileSize = opts.metadata.tile_dimension_zoom_0 / tiles;
@@ -51,10 +51,10 @@ function resolveUrl(opts: {
 
 function getTileFeatures(tile: VectorTile, opts: {
   coords: [number, number];
-  metadata: mvtMetadata;
+  metadata: MVTMetadata;
 }): turf.Feature[] {
   const features: turf.Feature[] = [];
-  const xform = proj4(opts.metadata.crs ?? 'EPSG:3857', 'EPSG:4326');
+  const xform = proj4(opts.metadata.crs, 'EPSG:4326');
   
   const project = ([x, y]: [number, number]) => xform.forward([
       x * opts.metadata.tile_dimension_zoom_0 + opts.metadata.tile_origin_upper_left_x,
@@ -76,7 +76,7 @@ function getTileFeatures(tile: VectorTile, opts: {
 export function retrieveTile(opts: {
   url: string;
   coords: [number, number];
-  metadata: mvtMetadata;
+  metadata: MVTMetadata;
 }): Promise<turf.Feature[]> {
   const url = resolveUrl({ url: opts.url, coords: opts.coords, zoom: opts.metadata.maxzoom });
   debug(`Retrieving ${url}`);
@@ -106,7 +106,7 @@ export function retrieveTile(opts: {
 export function retrieveNeighboringTiles(opts: {
   url: string;
   coords: [number, number];
-  metadata: mvtMetadata;
+  metadata: MVTMetadata;
   distance: number;
 }): Promise<turf.Feature[]> {
 

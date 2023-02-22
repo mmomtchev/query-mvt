@@ -2,29 +2,42 @@ import proj4 from 'proj4';
 import fetch from 'node-fetch';
 import * as turf from '@turf/turf';
 
-import { mvtMetadata } from './metadata';
+import { MVTMetadata } from './metadata';
 import { resolveTile, retrieveNeighboringTiles, retrieveTile } from './tile.js';
 import { debug } from './debug.js';
 
-export async function acquire(metadata: string): Promise<mvtMetadata> {
-  return fetch(metadata).then((data) => data.json()) as Promise<mvtMetadata>;
+/**
+ * @param {string} url URL of a GDAL-style metadata.json
+ * @returns {MVTMetadata}
+ */
+export async function acquire(url: string): Promise<MVTMetadata> {
+  return fetch(url).then((data) => data.json()) as Promise<MVTMetadata>;
 }
 
+/**
+ * 
+ * @param {Record<string, any>} opts options
+ * @param {string} opts.url Openlayers-style URL template for requesting tiles, must contain {x}, {y} and {z}
+ * @param {MVTMetadata} [opts.metadata] optional GDAL-style metadata.json, may be empty for world-wide EPSG:3857 tilesets
+ * @param {lon} opts.lon longitude
+ * @param {lat} opts.lat latitude
+ * @returns {turf.Feature}
+ */
 export async function search(opts: {
   url: string;
-  metadata: mvtMetadata;
+  metadata?: MVTMetadata;
   lon: number;
   lat: number;
   maxRadius?: number;
   maxFeatures?: number;
   maxParallel?: number;
 }) {
-  const metadata: mvtMetadata = {
+  const metadata: MVTMetadata = {
     tile_origin_upper_left_x: opts.metadata?.tile_origin_upper_left_x ?? -20037508.34,
     tile_origin_upper_left_y: opts.metadata?.tile_origin_upper_left_y ?? 20048966.1,
     tile_dimension_zoom_0: opts.metadata?.tile_dimension_zoom_0 ?? 20037508.34 * 2,
-    crs: opts.metadata.crs ?? 'EPSG:3857',
-    maxzoom: opts?.metadata?.maxzoom
+    crs: opts.metadata?.crs ?? 'EPSG:3857',
+    maxzoom: opts?.metadata?.maxzoom ?? 12
   };
   const xform = proj4('EPSG:4326', metadata.crs);
   const coords = xform.forward([opts.lon, opts.lat]) as [number, number];

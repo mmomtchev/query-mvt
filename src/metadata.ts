@@ -1,9 +1,9 @@
-export type mvtMetadata = {
+export type MVTMetadata = {
   name?: string;
   description?: string;
   version?: number;
   minzoom?: number;
-  maxzoom: number;
+  maxzoom?: number;
   center?: string;
   bounds?: string;
   type?: string;
