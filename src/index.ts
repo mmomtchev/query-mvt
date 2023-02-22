@@ -22,7 +22,14 @@ export async function search(opts: {
   maxFeatures?: number;
   maxParallel?: number;
 }) {
-  const xform = proj4('EPSG:4326', opts.metadata.crs ?? 'EPSG:3857');
+  const metadata: mvtMetadata = {
+    tile_origin_upper_left_x: opts.metadata?.tile_origin_upper_left_x ?? -20037508.34,
+    tile_origin_upper_left_y: opts.metadata?.tile_origin_upper_left_y ?? 20048966.1,
+    tile_dimension_zoom_0: opts.metadata?.tile_dimension_zoom_0 ?? 20037508.34 * 2,
+    crs: opts.metadata.crs ?? 'EPSG:3857',
+    maxzoom: opts?.metadata?.maxzoom
+  };
+  const xform = proj4('EPSG:4326', opts.metadata.crs);
   const coords = xform.forward([opts.lon, opts.lat]) as [number, number];
 
   const tileCoords = resolveTile({ coords, metadata: opts.metadata });

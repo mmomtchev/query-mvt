@@ -8,9 +8,9 @@ export type mvtMetadata = {
   bounds?: string;
   type?: string;
   format?: string;
-  crs: string;
-  tile_origin_upper_left_x: number;
-  tile_origin_upper_left_y: number;
-  tile_dimension_zoom_0: number;
+  crs?: string;
+  tile_origin_upper_left_x?: number;
+  tile_origin_upper_left_y?: number;
+  tile_dimension_zoom_0?: number;
   json?: string;
 };
