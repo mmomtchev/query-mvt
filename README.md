@@ -1,6 +1,9 @@
 # query-mvt
 
-Find the nearest feature to a given point from a remote MVT vector tiles layer
+Query features nearest to a given point from a remote MVT vector tiles layer
+
+[![License: ISC](https://img.shields.io/github/license/mmomtchev/query-mvt)](https://github.com/mmomtchev/query-mvt/blob/master/LICENSE)
+[![Node.js CI](https://github.com/mmomtchev/query-mvt/actions/workflows/node.js.yml/badge.svg)](https://github.com/mmomtchev/query-mvt/actions/workflows/node.js.yml)[![codecov](https://codecov.io/gh/mmomtchev/query-mvt/branch/main/graph/badge.svg?token=oT28J2XMYB)](https://codecov.io/gh/mmomtchev/query-mvt)
 
 # Usage
 
