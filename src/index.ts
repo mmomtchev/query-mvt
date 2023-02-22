@@ -56,6 +56,9 @@ export async function search(opts: {
     distance++;
   } while (min.f === null);
 
+  // TODO one last pass for compensating distanceX != distanceY
+  // (maybe [tile,tile-2] is a better match than [tile-1,tile])
+
   return {
     distance: min.d,
     feature: min.f
