@@ -1,8 +1,5 @@
-import { VectorTile, VectorTileFeature } from '@mapbox/vector-tile';
-import Protobuf from 'pbf';
 import proj4 from 'proj4';
 import fetch from 'node-fetch';
-import Queue from 'async-await-queue';
 import * as turf from '@turf/turf';
 
 import { mvtMetadata } from './metadata';
@@ -29,10 +26,10 @@ export async function search(opts: {
     crs: opts.metadata.crs ?? 'EPSG:3857',
     maxzoom: opts?.metadata?.maxzoom
   };
-  const xform = proj4('EPSG:4326', opts.metadata.crs);
+  const xform = proj4('EPSG:4326', metadata.crs);
   const coords = xform.forward([opts.lon, opts.lat]) as [number, number];
 
-  const tileCoords = resolveTile({ coords, metadata: opts.metadata });
+  const tileCoords = resolveTile({ coords, metadata: metadata });
   const targetCoords = turf.point([opts.lon, opts.lat]);
 
   let min = {
@@ -42,8 +39,8 @@ export async function search(opts: {
   let distance = 1;
   do {
     const features: turf.Feature[] = await Promise.all([
-      distance == 1 ? retrieveTile({ coords: tileCoords, metadata: opts.metadata, url: opts.url }).catch(() => []) : [],
-      retrieveNeighboringTiles({ coords: tileCoords, metadata: opts.metadata, url: opts.url, distance })
+      distance == 1 ? retrieveTile({ coords: tileCoords, metadata: metadata, url: opts.url }).catch(() => []) : [],
+      retrieveNeighboringTiles({ coords: tileCoords, metadata: metadata, url: opts.url, distance })
     ]).then(([first, next]) => [...first, ...next]);
 
     for (const f of features) {

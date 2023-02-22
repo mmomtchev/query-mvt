@@ -1,4 +1,4 @@
-import { VectorTile, VectorTileFeature } from '@mapbox/vector-tile';
+import { VectorTile } from '@mapbox/vector-tile';
 import Protobuf from 'pbf';
 import fetch from 'node-fetch';
 import * as turf from '@turf/turf';
@@ -11,7 +11,7 @@ declare module '@mapbox/vector-tile' {
   interface VectorTileFeature {
     toGeoJSON(x: number, y: number, z: number, project?: (xy: [number, number]) => [number, number]): GeoJSON.Feature;
   }
-};
+}
 
 export function resolveTile(opts: {
   coords: [number, number],
@@ -113,7 +113,7 @@ export function retrieveNeighboringTiles(opts: {
   const tiles = [] as Promise<turf.Feature[]>[];
 
   for (let i = -opts.distance; i <= opts.distance; i++) {
-    let tileCoords = [] as [number, number][];
+    const tileCoords = [] as [number, number][];
     tileCoords.push([opts.coords[0] + i, opts.coords[1] - opts.distance]);
     tileCoords.push([opts.coords[0] + i, opts.coords[1] + opts.distance]);
     // TODO: wrap around the antimeridian

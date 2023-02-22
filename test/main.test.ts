@@ -35,7 +35,7 @@ describe('should search for features', () => {
       .catch((e) => done(e));
   });
 
-  it.only('EPSG:3857 w/ explicit metadata', (done) => {
+  it('EPSG:3857 w/ explicit metadata', (done) => {
     search({
       url: 'https://github.com/mapbox/mvt-fixtures/raw/main/real-world/nepal/{z}-{x}-{y}.mvt',
       lon: 85.48914669754195,
