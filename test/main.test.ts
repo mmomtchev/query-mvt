@@ -19,7 +19,7 @@ describe('should search for features', () => {
       .catch((e) => done(e));
   });
 
-  it('EPSG:3857 w/o metadata', (done) => {
+  it('EPSG:3857 w/o metadata (mapbox fixtures)', (done) => {
     search({
       url: 'https://github.com/mapbox/mvt-fixtures/raw/main/real-world/bangkok/{z}-{x}-{y}.mvt',
       lon: 100.493782,
@@ -35,7 +35,7 @@ describe('should search for features', () => {
       .catch((e) => done(e));
   });
 
-  it('EPSG:3857 w/ explicit metadata', (done) => {
+  it('EPSG:3857 w/ explicit metadata (mapbox fixtures)', (done) => {
     search({
       url: 'https://github.com/mapbox/mvt-fixtures/raw/main/real-world/nepal/{z}-{x}-{y}.mvt',
       lon: 85.48914669754195,
@@ -51,6 +51,23 @@ describe('should search for features', () => {
       .then((result) => {
         assert.strictEqual(result.feature.properties['class'], 'shadow');
         assert.closeTo(result.distance, 0.07, 0.1);
+        done();
+      })
+      .catch((e) => done(e));
+  });
+
+  // The proof I do not discriminate based on past actions of past CEOs
+  it('EPSG:3857 w/o metadata (qwant)', (done) => {
+    search({
+      url: 'https://www.qwant.com/maps/tiles/ozbasemap/{z}/{x}/{y}.pbf',
+      lon: 2.35586,
+      lat: 48.83115,
+      metadata: { maxzoom: 12 }
+    })
+      .then((result) => {
+        assert.strictEqual(result.feature.properties['class'], 'service');
+        assert.strictEqual(result.feature.properties['service'], 'parking_aisle');
+        assert.closeTo(result.distance, 0.03, 0.1);
         done();
       })
       .catch((e) => done(e));
