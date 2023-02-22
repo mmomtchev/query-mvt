@@ -7,6 +7,8 @@
   "scripts": {
     "lint": "eslint src/* test/*",
     "lint:fix": "eslint --fix src/* test/*",
+    "c8": "node_modules/.bin/c8 mocha",
+    "lcov": "node_modules/.bin/c8 report --reporter=text-lcov > coverage/tests.lcov",
     "test": "npm run lint && mocha"
   },
   "repository": {
@@ -46,6 +48,7 @@
   "dependencies": {
     "@mapbox/vector-tile": "github:mmomtchev/vector-tile-js#projections",
     "@turf/turf": "^6.5.0",
+    "c8": "^7.13.0",
     "node-fetch": "^3.3.0",
     "pbf": "^3.2.1",
     "proj4": "^2.8.1"
