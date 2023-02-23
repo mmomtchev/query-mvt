@@ -1,4 +1,4 @@
-import { acquire, search, constants } from '../src/index.js';
+import { acquire, search, constants } from '..';
 
 import * as turf from '@turf/turf';
 

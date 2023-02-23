@@ -4,6 +4,5 @@
     "ts-node/register"
   ],
   "reporter": "tap",
-  "timeout": 20000,
-  "loader": "ts-node/esm"
+  "timeout": 20000
 }

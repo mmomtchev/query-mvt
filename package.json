@@ -4,7 +4,7 @@
   "description": "Query features from remote MVT tiles by location",
   "main": "dist/cjs/index.cjs",
   "module": "dist/es6/index.mjs",
-  "type": "module",
+  "browser": "dist/browser/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "lint": "eslint src/* test/*",
@@ -13,6 +13,14 @@
     "lcov": "node_modules/.bin/c8 report --reporter=text-lcov > coverage/tests.lcov",
     "build": "rollup -c rollup.config.js && tsc --emitDeclarationOnly -d --declarationDir dist --esModuleInterop src/index.ts",
     "test": "npm run lint && mocha"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/es6/index.mjs",
+      "default": "./dist/es6/index.mjs",
+      "require": "./dist/cjs/index.cjs"
+    }
   },
   "repository": {
     "type": "git",
