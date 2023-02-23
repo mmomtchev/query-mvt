@@ -8,6 +8,7 @@ export { Queue } from 'async-await-queue';
 import { MVTMetadata } from './metadata';
 export { MVTMetadata } from './metadata';
 import { resolveTile, retrieveNeighboringTiles, retrieveTile, shortestDistanceInNeighboringTiles } from './tile.js';
+import * as constants from './constants.js';
 export * as constants from './constants.js';
 import { debug } from './debug.js';
 
@@ -20,7 +21,7 @@ export type Result = {
    * Feature (turf.js and GeoJSON compatible)
    */
   feature: turf.Feature;
-}
+};
 const compareResults = (a: Result, b: Result) => b.distance - a.distance;
 
 /**
@@ -54,10 +55,16 @@ export async function search(opts: {
   queue?: Queue;
 }): Promise<Result[]> {
   const metadata: MVTMetadata = {
-    tile_origin_upper_left_x: opts.metadata?.tile_origin_upper_left_x ?? -20037508.34,
-    tile_origin_upper_left_y: opts.metadata?.tile_origin_upper_left_y ?? 20048966.1,
-    tile_dimension_zoom_0: opts.metadata?.tile_dimension_zoom_0 ?? 20037508.34 * 2,
-    crs: opts.metadata?.crs ?? 'EPSG:3857',
+    tile_origin_upper_left_x:
+      opts.metadata?.tile_origin_upper_left_x ??
+      constants.EPSG3857.tile_origin_upper_left_x,
+    tile_origin_upper_left_y:
+      opts.metadata?.tile_origin_upper_left_y ??
+      constants.EPSG3857.tile_origin_upper_left_y,
+    tile_dimension_zoom_0:
+      opts.metadata?.tile_dimension_zoom_0 ??
+      constants.EPSG3857.tile_dimension_zoom_0,
+    crs: opts.metadata?.crs ?? constants.EPSG3857.crs,
     maxzoom: opts?.metadata?.maxzoom ?? 12
   };
   const xform = proj4('EPSG:4326', metadata.crs);
@@ -91,7 +98,7 @@ export async function search(opts: {
       }
       debug(f.properties, d);
       if (d <= maxRadius && (results.size() < maxFeatures || d < (results.peek()?.distance ?? Infinity))) {
-        results.push({distance: d, feature: f});
+        results.push({ distance: d, feature: f });
         if (results.size() > maxFeatures) {
           results.pop();
         }

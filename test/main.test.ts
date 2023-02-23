@@ -53,9 +53,9 @@ describe('should search for features', () => {
       lat: 13.751126
     })
       .then((results) => {
-        assert.strictEqual(results[0].feature.properties['class'], 'school');
-        assert.strictEqual(results[0].feature.properties['type'], 'university');
-        assert.closeTo(results[0].distance, 0.11, 0.1);
+        assert.strictEqual(results[0].feature.properties['class'], 'tertiary');
+        assert.strictEqual(results[0].feature.properties['type'], 'tertiary');
+        assert.closeTo(results[0].distance, 0.09, 0.1);
         done();
       })
       .catch((e) => done(e));
@@ -64,15 +64,15 @@ describe('should search for features', () => {
   it('EPSG:3857 w/ explicit metadata (Mapbox fixtures)', (done) => {
     search({
       url: 'https://github.com/mapbox/mvt-fixtures/raw/main/real-world/nepal/{z}-{x}-{y}.mvt',
-      lon: 85.48914669754195,
-      lat: 28.290583497785597,
+      lon: 85.50263284446696, 
+      lat: 28.224049026770835,
       metadata: {
         ...constants.EPSG3857,
         maxzoom: 13,
       }
     })
       .then((results) => {
-        assert.strictEqual(results[0].feature.properties['class'], 'shadow');
+        assert.strictEqual(results[0].feature.properties['class'], 'stream');
         assert.closeTo(results[0].distance, 0.07, 0.1);
         done();
       })
@@ -86,13 +86,8 @@ describe('should search for features', () => {
       lon: 2.35586,
       lat: 48.83115,
       metadata: {
+        ...constants.EPSG3857,
         maxzoom: 13,
-        tile_dimension_zoom_0: constants.EPSG3857.tile_dimension_zoom_0,
-        tile_origin_upper_left_x: constants.EPSG3857.tile_origin_upper_left_x,
-        // IMPORTANT: Qwant seem to use non-standard EPSG:3857 world boundaries
-        // (they use a perfect 2:1 rectangle ending at 85.05N instead of 85.06N)
-        tile_origin_upper_left_y: -constants.EPSG3857.tile_origin_upper_left_x,
-        crs: 'EPSG:3857'
       }
     })
       .then((results) => {
@@ -110,11 +105,8 @@ describe('should search for features', () => {
       lat: 48.853289,
       filter: (f) => f.properties['class'] === 'city',
       metadata: {
+        ...constants.EPSG3857,
         maxzoom: 13,
-        tile_dimension_zoom_0: constants.EPSG3857.tile_dimension_zoom_0,
-        tile_origin_upper_left_x: constants.EPSG3857.tile_origin_upper_left_x,
-        tile_origin_upper_left_y: -constants.EPSG3857.tile_origin_upper_left_x,
-        crs: 'EPSG:3857'
       }
     })
       .then((results) => {
@@ -135,11 +127,8 @@ describe('should search for features', () => {
       maxFeatures: 100,
       maxRadius: 0.05,
       metadata: {
+        ...constants.EPSG3857,
         maxzoom: 13,
-        tile_dimension_zoom_0: constants.EPSG3857.tile_dimension_zoom_0,
-        tile_origin_upper_left_x: constants.EPSG3857.tile_origin_upper_left_x,
-        tile_origin_upper_left_y: -constants.EPSG3857.tile_origin_upper_left_x,
-        crs: 'EPSG:3857'
       }
     })
       .then((results) => {

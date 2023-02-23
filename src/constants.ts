@@ -1,7 +1,7 @@
 export const EPSG3857 = {
   tile_dimension_zoom_0: 20037508.34 * 2,
   tile_origin_upper_left_x: -20037508.34,
-  tile_origin_upper_left_y: 20048966.1,
+  tile_origin_upper_left_y: 20037508.34,
   crs: 'EPSG:3857'
 };
 
