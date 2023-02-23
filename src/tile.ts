@@ -14,6 +14,11 @@ declare module '@mapbox/vector-tile' {
   }
 }
 
+// wrap X tile coordinates around the AM
+function wrapAM(x: number, tiles: number): number {
+  return (x + tiles) % tiles;
+}
+
 // Find the tile coordinates from the projected coordinates
 export function resolveTile(opts: {
   coords: [number, number],
@@ -115,6 +120,7 @@ function getNeighboringTiles(opts: {
   distance: number;
 }) {
   const tileCoords = [] as [number, number][];
+  const tiles = 2 ** opts.metadata.maxzoom;
 
   for (let i = -opts.distance; i <= opts.distance; i++) {
     // Horizontal row on top
@@ -122,14 +128,13 @@ function getNeighboringTiles(opts: {
 
     // Horizontal row on bottom
     tileCoords.push([opts.coords[0] + i, opts.coords[1] + opts.distance]);
-    // TODO: wrap around the antimeridian
 
     if (i > -opts.distance && i < opts.distance) {
       // Vertical column on the left (excluding the corners)
-      tileCoords.push([opts.coords[0] - opts.distance, opts.coords[1] + i]);
+      tileCoords.push([wrapAM(opts.coords[0] - opts.distance, tiles), opts.coords[1] + i]);
 
       // Vertical column on the right (excluding the corners)
-      tileCoords.push([opts.coords[0] + opts.distance, opts.coords[1] + i]);
+      tileCoords.push([wrapAM(opts.coords[0] + opts.distance, tiles), opts.coords[1] + i]);
     }
   }
 
@@ -172,11 +177,22 @@ export function shortestDistanceInNeighboringTiles(opts: {
   const tiles = 2 ** opts.metadata.maxzoom;
   const tileSize = opts.metadata.tile_dimension_zoom_0 / tiles;
 
-  // TODO: wrap around the antimeridian
-  const ulTile = [opts.tileCoords[0] - opts.distance, opts.tileCoords[1] - opts.distance] as [number, number];
-  const urTile = [opts.tileCoords[0] + opts.distance, opts.tileCoords[1] - opts.distance] as [number, number];
-  const blTile = [opts.tileCoords[0] - opts.distance, opts.tileCoords[1] + opts.distance] as [number, number];
-  const brTile = [opts.tileCoords[0] + opts.distance, opts.tileCoords[1] + opts.distance] as [number, number];
+  const ulTile = [
+    wrapAM(opts.tileCoords[0] - opts.distance, tiles),
+    opts.tileCoords[1] - opts.distance
+  ] as [number, number];
+  const urTile = [
+    wrapAM(opts.tileCoords[0] + opts.distance, tiles),
+    opts.tileCoords[1] - opts.distance
+  ] as [number, number];
+  const blTile = [
+    wrapAM(opts.tileCoords[0] - opts.distance, tiles),
+    opts.tileCoords[1] + opts.distance
+  ] as [number, number];
+  const brTile = [
+    wrapAM(opts.tileCoords[0] + opts.distance, tiles),
+    opts.tileCoords[1] + opts.distance
+  ] as [number, number];
 
   const ulOrigin = originTile({ ...opts, coords: ulTile });
   const urOrigin = originTile({ ...opts, coords: urTile });

@@ -1,5 +1,7 @@
 import { acquire, search, constants } from '../src/index.js';
 
+import * as turf from '@turf/turf';
+
 import { assert } from 'chai';
 
 describe('should search for features', () => {
@@ -114,6 +116,26 @@ describe('should search for features', () => {
         assert.strictEqual(results[0].feature.properties['class'], 'city');
         assert.strictEqual(results[0].feature.properties['name'], 'Paris');
         assert.closeTo(results[0].distance, 0.04, 0.1);
+        done();
+      })
+      .catch((e) => done(e));
+  });
+
+  it('search across the antimeridian', (done) => {
+    search({
+      url: 'https://www.qwant.com/maps/tiles/ozbasemap/{z}/{x}/{y}.pbf',
+      lon: 179.999999,
+      lat: -16.160655,
+      maxFeatures: 50,
+      metadata: {
+        ...constants.EPSG3857,
+        maxzoom: 13,
+      }
+    })
+      .then((results) => {
+        const am = results.map((f) => turf.centroid(f.feature).geometry.coordinates[0] >= 0);
+        assert.isAtLeast(am.filter(v => v == true).length, 1);
+        assert.isAtLeast(am.filter(v => v == false).length, 1);
         done();
       })
       .catch((e) => done(e));
