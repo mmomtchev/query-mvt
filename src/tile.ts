@@ -169,29 +169,34 @@ export function shortestDistanceInNeighboringTiles(opts: {
   distance: number;
 }) {
   const xform = proj4(opts.metadata.crs, 'EPSG:4326');
-  const tileSize = opts.metadata.tile_dimension_zoom_0 / (2 ** opts.metadata.maxzoom);
+  const tiles = 2 ** opts.metadata.maxzoom;
+  const tileSize = opts.metadata.tile_dimension_zoom_0 / tiles;
 
   // TODO: wrap around the antimeridian
-  const topTile = [opts.tileCoords[0], opts.tileCoords[1] - opts.distance] as [number, number];
-  const leftTile = [opts.tileCoords[0] - opts.distance, opts.tileCoords[1]] as [number, number];
-  const rightTile = [opts.tileCoords[0] + opts.distance, opts.tileCoords[1]] as [number, number];
-  const bottomTile = [opts.tileCoords[0], opts.tileCoords[1] + opts.distance] as [number, number];
+  const ulTile = [opts.tileCoords[0] - opts.distance, opts.tileCoords[1] - opts.distance] as [number, number];
+  const urTile = [opts.tileCoords[0] + opts.distance, opts.tileCoords[1] - opts.distance] as [number, number];
+  const blTile = [opts.tileCoords[0] - opts.distance, opts.tileCoords[1] + opts.distance] as [number, number];
+  const brTile = [opts.tileCoords[0] + opts.distance, opts.tileCoords[1] + opts.distance] as [number, number];
 
-  const topOrigin = originTile({ ...opts, coords: topTile });
-  const leftOrigin = originTile({ ...opts, coords: leftTile });
-  const rightOrigin = originTile({ ...opts, coords: rightTile });
-  const bottomOrigin = originTile({ ...opts, coords: bottomTile });
+  const ulOrigin = originTile({ ...opts, coords: ulTile });
+  const urOrigin = originTile({ ...opts, coords: urTile });
+  const blOrigin = originTile({ ...opts, coords: blTile });
+  const brOrigin = originTile({ ...opts, coords: brTile });
 
-  const targetCoords = xform.inverse(opts.targetCoords.geometry.coordinates);
-  const topMin = turf.point(xform.forward([targetCoords[0], topOrigin[1] - tileSize]));
-  const leftMin = turf.point(xform.forward([leftOrigin[0] + tileSize, targetCoords[1]]));
-  const rightMin = turf.point(xform.forward([rightOrigin[0], targetCoords[1]]));
-  const bottomMin = turf.point(xform.forward([targetCoords[0], bottomOrigin[1]]));
+  const ulCoords = xform.forward([ulOrigin[0] + tileSize, ulOrigin[1] - tileSize]);
+  const urCoords = xform.forward([urOrigin[0], urOrigin[1] - tileSize]);
+  const blCoords = xform.forward([blOrigin[0] + tileSize, blOrigin[1]]);
+  const brCoords = xform.forward([brOrigin[0], brOrigin[1]]);
+
+  const topEdge = turf.lineString([ulCoords, urCoords]);
+  const leftEdge = turf.lineString([ulCoords, blCoords]);
+  const rightEdge = turf.lineString([brCoords, urCoords]);
+  const bottomEdge = turf.lineString([brCoords, blCoords]);
 
   return Math.min(
-    turf.distance(opts.targetCoords, topMin),
-    turf.distance(opts.targetCoords, leftMin),
-    turf.distance(opts.targetCoords, rightMin),
-    turf.distance(opts.targetCoords, bottomMin)
+    turf.pointToLineDistance(opts.targetCoords, topEdge),
+    turf.pointToLineDistance(opts.targetCoords, leftEdge),
+    turf.pointToLineDistance(opts.targetCoords, rightEdge),
+    turf.pointToLineDistance(opts.targetCoords, bottomEdge)
   );
 }
