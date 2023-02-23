@@ -22,6 +22,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm ci
+    - run: npm run build
     - run: npm test
 
   codecov:
@@ -35,6 +36,7 @@ jobs:
       with:
         node-version: 18.x
     - run: npm ci
+    - run: npm run build
     - run: npm run c8
     - run: npm run lcov
     - name: Upload coverage reports to Codecov
