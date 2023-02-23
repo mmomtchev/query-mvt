@@ -12,7 +12,7 @@ export default [
     },
     plugins: [
       inject({
-        fetch: ['node-fetch', 'fetch']
+        fetch: 'node-fetch'
       }),
       typescript(),
       terser()
@@ -27,7 +27,7 @@ export default [
     },
     plugins: [
       inject({
-        fetch: ['node-fetch', 'fetch']
+        fetch: 'node-fetch'
       }),
       typescript()
     ]
