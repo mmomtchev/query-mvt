@@ -11,7 +11,7 @@
     "lint:fix": "eslint --fix src/* test/*",
     "c8": "node_modules/.bin/c8 mocha",
     "lcov": "node_modules/.bin/c8 report --reporter=text-lcov > coverage/tests.lcov",
-    "build": "rollup -c rollup.config.js && tsc --emitDeclarationOnly -d --declarationDir dist --esModuleInterop src/index.ts",
+    "build": "rollup -c rollup.config.mjs && tsc --emitDeclarationOnly -d --declarationDir dist --esModuleInterop src/index.ts",
     "test": "npm run lint && mocha"
   },
   "exports": {
