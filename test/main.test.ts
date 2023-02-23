@@ -3,7 +3,7 @@ import { acquire, search } from '../src/index.js';
 import { assert } from 'chai';
 
 describe('should search for features', () => {
-  it.only('EPSG:4326 w/ metadata', (done) => {
+  it('EPSG:4326 w/ metadata', (done) => {
     acquire('https://velivole.b-cdn.net/tiles/place/2/metadata.json')
       .then((metadata) => search({
         url: 'https://velivole.b-cdn.net/tiles/place/2/{z}/{x}/{y}.pbf',

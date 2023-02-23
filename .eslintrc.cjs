@@ -20,6 +20,7 @@ module.exports = {
     },
     rules: {
         quotes: ['error', 'single'],
-        semi: ['error', 'always']
+        semi: ['error', 'always'],
+        'mocha/no-exclusive-tests': 'error'
     }
 };
