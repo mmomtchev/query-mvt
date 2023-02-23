@@ -37,7 +37,9 @@ export async function acquire(url: string): Promise<MVTMetadata> {
  * @param {number} opts.lon longitude
  * @param {number} opts.lat latitude
  * @param {Queue} opts.queue optional shared Queue to be used for limiting concurrency, @default Queue(8,0)
- * @param {number} opts.maxFeature optional number of features to return, @default 1
+ * @param {number} opts.maxFeatures optional number of features to return, @default 1
+ * @param {number} opts.maxRadius optional maximum radius in km to search in, @default 10
+ * @param {number} opts.filter optional filter function, will receive features one by one, must return keep (true) or discard (false)
  * @returns {turf.Feature}
  */
 export async function search(opts: {
@@ -47,6 +49,7 @@ export async function search(opts: {
   lat: number;
   maxRadius?: number;
   maxFeatures?: number;
+  filter?: (feature: turf.Feature) => boolean,
   queue?: Queue;
 }): Promise<Result[]> {
   const metadata: MVTMetadata = {
@@ -67,10 +70,12 @@ export async function search(opts: {
   const queue = opts.queue ?? new Queue(8, 0);
   const results = new Heap<Result>(compareResults);
   do {
-    const features: turf.Feature[] = await Promise.all([
+    let features: turf.Feature[] = await Promise.all([
       distance == 1 ? retrieveTile({ coords: tileCoords, metadata: metadata, url: opts.url, queue }).catch(() => []) : [],
       retrieveNeighboringTiles({ coords: tileCoords, metadata: metadata, url: opts.url, distance, queue })
     ]).then(([first, next]) => [...first, ...next]);
+    if (opts.filter)
+      features = features.filter(opts.filter);
 
     for (const f of features) {
       let d: number;

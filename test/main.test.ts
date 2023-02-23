@@ -77,4 +77,24 @@ describe('should search for features', () => {
       })
       .catch((e) => done(e));
   });
+
+  it('search by class', (done) => {
+    search({
+      url: 'https://www.qwant.com/maps/tiles/ozbasemap/{z}/{x}/{y}.pbf',
+      lon: 2.35586,
+      lat: 48.83115,
+      maxFeatures: 2,
+      filter: (f) => f.properties['class'] === 'city'
+    })
+      .then((results) => {
+        assert.lengthOf(results, 2);
+        assert.strictEqual(results[0].feature.properties['class'], 'city');
+        assert.strictEqual(results[0].feature.properties['name'], 'Paris');
+        assert.strictEqual(results[1].feature.properties['class'], 'city');
+        assert.strictEqual(results[1].feature.properties['name'], 'Paris');
+        assert.closeTo(results[0].distance, 10.02, 0.1);
+        done();
+      })
+      .catch((e) => done(e));
+  });
 });
