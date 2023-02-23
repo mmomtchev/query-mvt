@@ -1,12 +1,13 @@
 import { VectorTile } from '@mapbox/vector-tile';
 import Protobuf from 'pbf';
-import fetch from 'node-fetch';
 import * as turf from '@turf/turf';
 import proj4 from 'proj4';
 import { Queue } from 'async-await-queue';
 
 import { MVTMetadata } from './metadata';
 import { debug } from './debug.js';
+
+//useFetch;
 
 declare module '@mapbox/vector-tile' {
   interface VectorTileFeature {
