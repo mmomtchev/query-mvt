@@ -14,6 +14,7 @@ declare module '@mapbox/vector-tile' {
   }
 }
 
+// Find the tile coordinates from the projected coordinates
 export function resolveTile(opts: {
   coords: [number, number],
   metadata: MVTMetadata;
@@ -26,6 +27,7 @@ export function resolveTile(opts: {
   return [x, y];
 }
 
+// Find the projected coordinates of the origin of the tile from the tile coordinates
 export function originTile(opts: {
   coords: [number, number],
   metadata: MVTMetadata;
@@ -33,8 +35,8 @@ export function originTile(opts: {
   const tiles = 2 ** opts.metadata.maxzoom;
   const tileSize = opts.metadata.tile_dimension_zoom_0 / tiles;
 
-  const x = opts.coords[0] * tileSize + opts.metadata.tile_origin_upper_left_x[0];
-  const y = opts.metadata.tile_origin_upper_left_y[1] - opts.coords[1] * tileSize;
+  const x = opts.coords[0] * tileSize + opts.metadata.tile_origin_upper_left_x;
+  const y = opts.metadata.tile_origin_upper_left_y - opts.coords[1] * tileSize;
 
   return [x, y];
 }
@@ -106,6 +108,35 @@ export function retrieveTile(opts: {
   );
 }
 
+/* Get the tile coordinates of a square of tiles around the target tile */
+function getNeighboringTiles(opts: {
+  coords: [number, number];
+  metadata: MVTMetadata;
+  distance: number;
+}) {
+  const tileCoords = [] as [number, number][];
+
+  for (let i = -opts.distance; i <= opts.distance; i++) {
+    // Horizontal row on top
+    tileCoords.push([opts.coords[0] + i, opts.coords[1] - opts.distance]);
+
+    // Horizontal row on bottom
+    tileCoords.push([opts.coords[0] + i, opts.coords[1] + opts.distance]);
+    // TODO: wrap around the antimeridian
+
+    if (i > -opts.distance && i < opts.distance) {
+      // Vertical column on the left (excluding the corners)
+      tileCoords.push([opts.coords[0] - opts.distance, opts.coords[1] + i]);
+
+      // Vertical column on the right (excluding the corners)
+      tileCoords.push([opts.coords[0] + opts.distance, opts.coords[1] + i]);
+    }
+  }
+
+  return tileCoords;
+}
+
+/* Get a square of tiles around the target tile */
 export function retrieveNeighboringTiles(opts: {
   url: string;
   coords: [number, number];
@@ -113,27 +144,53 @@ export function retrieveNeighboringTiles(opts: {
   distance: number;
   queue: Queue;
 }): Promise<turf.Feature[]> {
-
+  const tileCoords = getNeighboringTiles(opts);
   const tiles = [] as Promise<turf.Feature[]>[];
-
-  for (let i = -opts.distance; i <= opts.distance; i++) {
-    const tileCoords = [] as [number, number][];
-    tileCoords.push([opts.coords[0] + i, opts.coords[1] - opts.distance]);
-    tileCoords.push([opts.coords[0] + i, opts.coords[1] + opts.distance]);
-    // TODO: wrap around the antimeridian
-    tileCoords.push(i > -opts.distance && i < opts.distance ? [opts.coords[0] - opts.distance, opts.coords[1] + i] : [-1, -1]);
-    tileCoords.push(i > -opts.distance && i < opts.distance ? [opts.coords[0] + opts.distance, opts.coords[1] + i] : [-1, -1]);
-
-    for (const coords of tileCoords) {
-      if (coords[0] >= 0)
-        tiles.push(retrieveTile({
-          url: opts.url,
-          coords: coords,
-          metadata: opts.metadata,
-          queue: opts.queue
-        }).catch(() => [] as turf.Feature[]));
-    }
+  for (const coords of tileCoords) {
+    if (coords[0] >= 0)
+      tiles.push(retrieveTile({
+        url: opts.url,
+        coords: coords,
+        metadata: opts.metadata,
+        queue: opts.queue
+      }).catch(() => [] as turf.Feature[]));
   }
 
   return Promise.all(tiles).then((features) => features.flat());
+}
+
+/* Find the shortest possible distance in a square of tiles around the target tile */
+export function shortestDistanceInNeighboringTiles(opts: {
+  // Geographical coordinates of the target point
+  targetCoords: turf.Feature<turf.Point>;
+  // Tile coordinates of the target tile
+  tileCoords: [number, number];
+  metadata: MVTMetadata;
+  distance: number;
+}) {
+  const xform = proj4(opts.metadata.crs, 'EPSG:4326');
+  const tileSize = opts.metadata.tile_dimension_zoom_0 / (2 ** opts.metadata.maxzoom);
+
+  // TODO: wrap around the antimeridian
+  const ulTile = [opts.tileCoords[0] - opts.distance, opts.tileCoords[1] - opts.distance] as [number, number];
+  const urTile = [opts.tileCoords[0] + opts.distance, opts.tileCoords[1] - opts.distance] as [number, number];
+  const blTile = [opts.tileCoords[0] - opts.distance, opts.tileCoords[1] + opts.distance] as [number, number];
+  const brTile = [opts.tileCoords[0] + opts.distance, opts.tileCoords[1] + opts.distance] as [number, number];
+
+  const ulOrigin = originTile({ ...opts, coords: ulTile });
+  const urOrigin = originTile({ ...opts, coords: urTile });
+  const blOrigin = originTile({ ...opts, coords: blTile });
+  const brOrigin = originTile({ ...opts, coords: brTile });
+
+  const ulMin = turf.point(xform.forward([ulOrigin[0] + tileSize, ulOrigin[1] - tileSize]));
+  const urMin = turf.point(xform.forward([urOrigin[0], urOrigin[1] - tileSize]));
+  const blMin = turf.point(xform.forward([blOrigin[0] + tileSize, blOrigin[1]]));
+  const brMin = turf.point(xform.forward([brOrigin[0], brOrigin[1]]));
+
+  return Math.min(
+    turf.distance(opts.targetCoords, ulMin),
+    turf.distance(opts.targetCoords, urMin),
+    turf.distance(opts.targetCoords, blMin),
+    turf.distance(opts.targetCoords, brMin)
+  );
 }

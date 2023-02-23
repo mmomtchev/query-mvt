@@ -7,7 +7,8 @@ export { Queue } from 'async-await-queue';
 
 import { MVTMetadata } from './metadata';
 export { MVTMetadata } from './metadata';
-import { resolveTile, retrieveNeighboringTiles, retrieveTile } from './tile.js';
+import { resolveTile, retrieveNeighboringTiles, retrieveTile, shortestDistanceInNeighboringTiles } from './tile.js';
+export * as constants from './constants.js';
 import { debug } from './debug.js';
 
 export type Result = {
@@ -66,7 +67,9 @@ export async function search(opts: {
   const targetCoords = turf.point([opts.lon, opts.lat]);
 
   const maxFeatures = opts.maxFeatures ?? 1;
+  const maxRadius = opts.maxRadius ?? 10;
   let distance = 1;
+  let shortestDistance: number;
   const queue = opts.queue ?? new Queue(8, 0);
   const results = new Heap<Result>(compareResults);
   do {
@@ -87,7 +90,7 @@ export async function search(opts: {
         d = turf.distance(targetCoords, turf.centroid(geom));
       }
       debug(f.properties, d);
-      if (results.size() < maxFeatures || d < (results.peek()?.distance ?? Infinity)) {
+      if (d <= maxRadius && (results.size() < maxFeatures || d < (results.peek()?.distance ?? Infinity))) {
         results.push({distance: d, feature: f});
         if (results.size() > maxFeatures) {
           results.pop();
@@ -95,10 +98,18 @@ export async function search(opts: {
       }
     }
     distance++;
-  } while (results.size() < maxFeatures);
+    // Get the shortest possible distance that a feature from the next iteration can have
+    shortestDistance = shortestDistanceInNeighboringTiles({
+      targetCoords,
+      tileCoords,
+      metadata,
+      distance
+    });
 
-  // TODO one last pass for compensating distanceX != distanceY
-  // (maybe [tile,tile-2] is a better match than [tile-1,tile])
+    if (shortestDistance > maxRadius)
+      break;
+
+  } while (results.size() < maxFeatures || (results.peek()?.distance ?? Infinity) > shortestDistance);
 
   return Array.from(results).reverse();
 }
