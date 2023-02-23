@@ -49,6 +49,7 @@
     "@mapbox/vector-tile": "github:mmomtchev/vector-tile-js#projections",
     "@turf/turf": "^6.5.0",
     "c8": "^7.13.0",
+    "heap-js": "^2.2.0",
     "node-fetch": "^3.3.0",
     "pbf": "^3.2.1",
     "proj4": "^2.8.1"

@@ -2,11 +2,25 @@ import proj4 from 'proj4';
 import fetch from 'node-fetch';
 import * as turf from '@turf/turf';
 import { Queue } from 'async-await-queue';
+import { Heap } from 'heap-js';
 export { Queue } from 'async-await-queue';
 
 import { MVTMetadata } from './metadata';
+export { MVTMetadata } from './metadata';
 import { resolveTile, retrieveNeighboringTiles, retrieveTile } from './tile.js';
 import { debug } from './debug.js';
+
+export type Result = {
+  /**
+   * Distance in km
+   */
+  distance: number;
+  /**
+   * Feature (turf.js and GeoJSON compatible)
+   */
+  feature: turf.Feature;
+}
+const compareResults = (a: Result, b: Result) => b.distance - a.distance;
 
 /**
  * @param {string} url URL of a GDAL-style metadata.json
@@ -34,7 +48,7 @@ export async function search(opts: {
   maxRadius?: number;
   maxFeatures?: number;
   queue?: Queue;
-}) {
+}): Promise<Result[]> {
   const metadata: MVTMetadata = {
     tile_origin_upper_left_x: opts.metadata?.tile_origin_upper_left_x ?? -20037508.34,
     tile_origin_upper_left_y: opts.metadata?.tile_origin_upper_left_y ?? 20048966.1,
@@ -48,12 +62,10 @@ export async function search(opts: {
   const tileCoords = resolveTile({ coords, metadata: metadata });
   const targetCoords = turf.point([opts.lon, opts.lat]);
 
-  let min = {
-    d: Infinity as number,
-    f: null as turf.Feature | null
-  };
+  const maxFeatures = opts.maxFeatures ?? 1;
   let distance = 1;
   const queue = opts.queue ?? new Queue(8, 0);
+  const results = new Heap<Result>(compareResults);
   do {
     const features: turf.Feature[] = await Promise.all([
       distance == 1 ? retrieveTile({ coords: tileCoords, metadata: metadata, url: opts.url, queue }).catch(() => []) : [],
@@ -70,18 +82,18 @@ export async function search(opts: {
         d = turf.distance(targetCoords, turf.centroid(geom));
       }
       debug(f.properties, d);
-      if (d < min.d) {
-        min = { d, f };
+      if (results.size() < maxFeatures || d < (results.peek()?.distance ?? Infinity)) {
+        results.push({distance: d, feature: f});
+        if (results.size() > maxFeatures) {
+          results.pop();
+        }
       }
     }
     distance++;
-  } while (min.f === null);
+  } while (results.size() < maxFeatures);
 
   // TODO one last pass for compensating distanceX != distanceY
   // (maybe [tile,tile-2] is a better match than [tile-1,tile])
 
-  return {
-    distance: min.d,
-    feature: min.f
-  };
+  return Array.from(results).reverse();
 }

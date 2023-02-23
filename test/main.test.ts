@@ -3,17 +3,23 @@ import { acquire, search } from '../src/index.js';
 import { assert } from 'chai';
 
 describe('should search for features', () => {
-  it('EPSG:4326 w/ metadata', (done) => {
+  it.only('EPSG:4326 w/ metadata', (done) => {
     acquire('https://velivole.b-cdn.net/tiles/place/2/metadata.json')
       .then((metadata) => search({
         url: 'https://velivole.b-cdn.net/tiles/place/2/{z}/{x}/{y}.pbf',
         lon: 6.220432,
         lat: 45.779170,
-        metadata
+        metadata,
+        maxFeatures: 3
       }))
-      .then((result) => {
-        assert.strictEqual(result.feature.properties['n'], 'Doussard');
-        assert.closeTo(result.distance, 0.34, 0.1);
+      .then((results) => {
+        assert.lengthOf(results, 3);
+        assert.strictEqual(results[0].feature.properties['n'], 'Doussard');
+        assert.closeTo(results[0].distance, 0.34, 0.01);
+        assert.strictEqual(results[1].feature.properties['n'], 'Lathuile');
+        assert.closeTo(results[1].distance, 1.23, 0.01);
+        assert.strictEqual(results[2].feature.properties['n'], 'Chevaline');
+        assert.closeTo(results[2].distance, 1.86, 0.01);
         done();
       })
       .catch((e) => done(e));
@@ -26,10 +32,10 @@ describe('should search for features', () => {
       lat: 13.751126,
       metadata: { maxzoom: 12 }
     })
-      .then((result) => {
-        assert.strictEqual(result.feature.properties['class'], 'school');
-        assert.strictEqual(result.feature.properties['type'], 'university');
-        assert.closeTo(result.distance, 0.11, 0.1);
+      .then((results) => {
+        assert.strictEqual(results[0].feature.properties['class'], 'school');
+        assert.strictEqual(results[0].feature.properties['type'], 'university');
+        assert.closeTo(results[0].distance, 0.11, 0.1);
         done();
       })
       .catch((e) => done(e));
@@ -48,9 +54,9 @@ describe('should search for features', () => {
         crs: 'EPSG:3857'
       }
     })
-      .then((result) => {
-        assert.strictEqual(result.feature.properties['class'], 'shadow');
-        assert.closeTo(result.distance, 0.07, 0.1);
+      .then((results) => {
+        assert.strictEqual(results[0].feature.properties['class'], 'shadow');
+        assert.closeTo(results[0].distance, 0.07, 0.1);
         done();
       })
       .catch((e) => done(e));
@@ -63,10 +69,10 @@ describe('should search for features', () => {
       lon: 2.35586,
       lat: 48.83115
     })
-      .then((result) => {
-        assert.strictEqual(result.feature.properties['class'], 'service');
-        assert.strictEqual(result.feature.properties['service'], 'parking_aisle');
-        assert.closeTo(result.distance, 0.03, 0.1);
+      .then((results) => {
+        assert.strictEqual(results[0].feature.properties['class'], 'service');
+        assert.strictEqual(results[0].feature.properties['service'], 'parking_aisle');
+        assert.closeTo(results[0].distance, 0.03, 0.1);
         done();
       })
       .catch((e) => done(e));
