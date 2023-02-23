@@ -43,7 +43,7 @@ export default [
     },
     plugins: [
       replace({
-        '//useFetch': 'import fetch from \'node-fetch\';',
+        '//useFetch': '',
         preventAssignment: true
       }),
       typescript()
