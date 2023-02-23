@@ -1,5 +1,4 @@
 import proj4 from 'proj4';
-import fetch from 'node-fetch';
 import * as turf from '@turf/turf';
 import { Queue } from 'async-await-queue';
 import { Heap } from 'heap-js';
@@ -11,6 +10,8 @@ import { resolveTile, retrieveNeighboringTiles, retrieveTile, shortestDistanceIn
 import * as constants from './constants.js';
 export * as constants from './constants.js';
 import { debug } from './debug.js';
+
+//useFetch;
 
 export type Result = {
   /**

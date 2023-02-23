@@ -4,7 +4,7 @@ import * as turf from '@turf/turf';
 
 import { assert } from 'chai';
 
-describe('should search for features', () => {
+describe('search()', () => {
   it('EPSG:4326 w/ automatic metadata', (done) => {
     acquire('https://velivole.b-cdn.net/tiles/place/2/metadata.json')
       .then((metadata) => search({
