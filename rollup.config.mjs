@@ -1,5 +1,5 @@
 import typescript from '@rollup/plugin-typescript';
-import replace from '@rollup/plugin-replace';
+import inject from '@rollup/plugin-inject';
 import terser from '@rollup/plugin-terser';
 
 export default [
@@ -11,9 +11,8 @@ export default [
       sourcemap: true
     },
     plugins: [
-      replace({
-        '//useFetch': 'import fetch from \'node-fetch\';',
-        preventAssignment: true
+      inject({
+        fetch: ['node-fetch', 'fetch']
       }),
       typescript(),
       terser()
@@ -27,9 +26,8 @@ export default [
       sourcemap: true
     },
     plugins: [
-      replace({
-        '//useFetch': 'import fetch from \'node-fetch\';',
-        preventAssignment: true
+      inject({
+        fetch: ['node-fetch', 'fetch']
       }),
       typescript()
     ]
@@ -42,10 +40,6 @@ export default [
       sourcemap: true
     },
     plugins: [
-      replace({
-        '//useFetch': '',
-        preventAssignment: true
-      }),
       typescript()
     ]
   }
