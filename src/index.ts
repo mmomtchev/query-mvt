@@ -81,11 +81,9 @@ export async function search(opts: {
   let distance = 1;
   let shortestDistance: number;
   const queue = opts.queue ?? new Queue(8, 0);
-  const fetchOpts: RequestInit = opts.fetchOpts ?? {
-    headers: {
-      'accept-encoding': 'gzip,deflate'
-    }
-  };
+  const fetchOpts: RequestInit = opts.fetchOpts ?? {};
+  if (!fetchOpts.headers) fetchOpts.headers = {};
+  fetchOpts.headers['accept-encoding'] = 'gzip,deflate';
   const results = new Heap<Result>(compareResults);
   do {
     let features: turf.Feature[] = await Promise.all([
