@@ -43,10 +43,10 @@ export async function acquire(url: string, fetchOpts?: RequestInit): Promise<MVT
  * @param {MVTMetadata} [opts.metadata] optional GDAL-style metadata.json, may be empty for world-wide EPSG:3857 tilesets
  * @param {number} opts.lon longitude
  * @param {number} opts.lat latitude
- * @param {Queue} opts.queue optional shared Queue to be used for limiting concurrency, @default Queue(8,0)
- * @param {number} opts.maxFeatures optional number of features to return, @default 1
- * @param {number} opts.maxRadius optional maximum radius in km to search in, @default 10
- * @param {(feature: turf.Feature) => boolean} opts.filter optional filter function, will receive features one by one, must return keep (true) or discard (false)
+ * @param {Queue} [opts.queue] optional shared Queue to be used for limiting concurrency, @default Queue(8,0)
+ * @param {number} [opts.maxFeatures] optional number of features to return, @default 1
+ * @param {number} [opts.maxRadius] optional maximum radius in km to search in, @default 10
+ * @param {(feature: turf.Feature) => boolean} [opts.filter} optional filter function, will receive features one by one, must return keep (true) or discard (false)
  * @param {RequestInit} [opts.fetchOpts] optional fetch options (AbortController, authorization headers...)
  * @param {boolean} [opts.dedupe] dedupe the returned features (as the text will usually stretch across several tiles)
  * 
