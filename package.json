@@ -13,7 +13,7 @@
     "lcov": "node_modules/.bin/c8 report --reporter=text-lcov > coverage/tests.lcov",
     "build": "rollup -c rollup.config.mjs && tsc --emitDeclarationOnly -d --declarationDir dist --esModuleInterop src/index.ts",
     "doc": "documentation readme --section API src/index.ts",
-    "version": "npm run build && npm run doc && git add package.json docs",
+    "version": "npm run build && npm run doc && git add package.json README.md",
     "test": "npm run lint && mocha"
   },
   "bin": {

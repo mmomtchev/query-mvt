@@ -126,10 +126,9 @@ Returns **MVTMetadata**&#x20;
     *   `opts.metadata` **MVTMetadata?** optional GDAL-style metadata.json, may be empty for world-wide EPSG:3857 tilesets
     *   `opts.lon` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** longitude
     *   `opts.lat` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** latitude
-    *   `opts.queue` **Queue** optional shared Queue to be used for limiting concurrency, @default Queue(8,0)
-    *   `opts.maxFeatures` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** optional number of features to return, @default 1
-    *   `opts.maxRadius` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** optional maximum radius in km to search in, @default 10
-    *   `opts.filter` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** optional filter function, will receive features one by one, must return keep (true) or discard (false)
+    *   `opts.queue` **Queue?** optional shared Queue to be used for limiting concurrency, @default Queue(8,0)
+    *   `opts.maxFeatures` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** optional number of features to return, @default 1
+    *   `opts.maxRadius` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** optional maximum radius in km to search in, @default 10
     *   `opts.fetchOpts` **RequestInit?** optional fetch options (AbortController, authorization headers...)
     *   `opts.dedupe` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** dedupe the returned features (as the text will usually stretch across several tiles)
 
