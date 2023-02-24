@@ -3,6 +3,8 @@ import * as turf from '@turf/turf';
 import { Queue } from 'async-await-queue';
 import { Heap } from 'heap-js';
 export { Queue } from 'async-await-queue';
+import md5 from 'crypto-js/md5.js';
+import Base64 from 'crypto-js/enc-base64.js';
 
 import { MVTMetadata } from './metadata';
 export { MVTMetadata } from './metadata';
@@ -102,7 +104,7 @@ export async function search(opts: {
       let d: number;
       const geom = f.geometry;
       if (opts.dedupe) {
-        const hash = JSON.stringify(f);
+        const hash = Base64.stringify(md5(JSON.stringify(f)));
         if (seen.has(hash))
           continue;
         seen.add(hash);

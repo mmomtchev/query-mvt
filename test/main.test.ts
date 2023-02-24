@@ -159,4 +159,25 @@ describe('search()', () => {
       })
       .catch((e) => done(e));
   });
+
+  it('dedupe identical features', (done) => {
+    search({
+      url: 'https://www.qwant.com/maps/tiles/ozbasemap/{z}/{x}/{y}.pbf',
+      lon: 6.220432,
+      lat: 45.779170,
+      maxFeatures: 100,
+      filter: (f) => f.properties['rank'] === 11,
+      metadata: {
+        ...constants.EPSG3857,
+        maxzoom: 13,
+      },
+      dedupe: true
+    })
+      .then((results) => {
+        assert.strictEqual(results[0].feature.properties['name'], 'Doussard');
+        assert.strictEqual(results[1].feature.properties['name'], 'Lathuile');
+        done();
+      })
+      .catch((e) => done(e));
+  });
 });
