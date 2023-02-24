@@ -5,9 +5,9 @@ Query features nearest to a given point from a remote MVT vector tiles layer
 [![License: ISC](https://img.shields.io/github/license/mmomtchev/query-mvt)](https://github.com/mmomtchev/query-mvt/blob/master/LICENSE)
 [![Node.js CI](https://github.com/mmomtchev/query-mvt/actions/workflows/node.js.yml/badge.svg)](https://github.com/mmomtchev/query-mvt/actions/workflows/node.js.yml)[![codecov](https://codecov.io/gh/mmomtchev/query-mvt/branch/main/graph/badge.svg?token=oT28J2XMYB)](https://codecov.io/gh/mmomtchev/query-mvt)
 
-`query-mvt` allows you query remote vector tile sets for features. It enables API-like access through the front door, behaving as a browser displaying the map.
+`query-mvt` allows you query remote vector tile sets for features. Its main advantage is that it does not require any special access or server-side software as it mimics the behavior of a web browser displaying the map.
 
-It works both in Node.js and in the browser. It supports all vector mapping services that use MVT/PBF and can adapt to different projections and different world bounds.
+It works both in Node.js and in the browser. It supports all vector mapping services that use MVT/PBF files and can adapt to different projections and tileset extents.
 
 # Usage
 
