@@ -85,6 +85,12 @@ import { acquire, MVTMetadata, search, constants } from '.';
       boolean: true,
       alias: 'w'
     })
+    .option('dedupe', {
+      describe: 'Eliminate duplicates',
+      default: true,
+      boolean: true,
+      alias: 'd'
+    })
     .example('$0 45.779 6.22', 'query nearest feature')
     .example('$0 45.779 6.22 -f class=village ', 'query nearest village')
     .demandCommand(2)
@@ -119,7 +125,7 @@ import { acquire, MVTMetadata, search, constants } from '.';
       for (const flt of argv.filter as string[]) {
         const [key, value] = flt.split('=');
         const actual = feature.properties[key];
-        if (!actual || actual !== value)
+        if (!actual || actual != value)
           return false;
       }
       return true;
@@ -131,6 +137,7 @@ import { acquire, MVTMetadata, search, constants } from '.';
     maxRadius: argv.radius,
     metadata,
     filter,
+    dedupe: argv.dedupe,
     lat: argv._[0] as number,
     lon: argv._[1] as number
   });

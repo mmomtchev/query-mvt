@@ -43,6 +43,7 @@ export async function acquire(url: string, fetchOpts?: RequestInit): Promise<MVT
  * @param {number} opts.maxRadius optional maximum radius in km to search in, @default 10
  * @param {number} opts.filter optional filter function, will receive features one by one, must return keep (true) or discard (false)
  * @param {RequestInit} [opts.fetchOpts] optional fetch options (AbortController, authorization headers...)
+ * @param {boolean} [opts.dedupe] dedupe the returned features (as the text will usually stretch across several tiles)
  * 
  * @returns {turf.Feature}
  */
@@ -56,6 +57,7 @@ export async function search(opts: {
   filter?: (feature: turf.Feature) => boolean,
   queue?: Queue;
   fetchOpts?: RequestInit;
+  dedupe?: boolean;
 }): Promise<Result[]> {
   const metadata: MVTMetadata = {
     tile_origin_upper_left_x:
@@ -78,13 +80,16 @@ export async function search(opts: {
 
   const maxFeatures = opts.maxFeatures ?? 1;
   const maxRadius = opts.maxRadius ?? 10;
-  let distance = 1;
-  let shortestDistance: number;
   const queue = opts.queue ?? new Queue(8, 0);
+
   const fetchOpts: RequestInit = opts.fetchOpts ?? {};
   if (!fetchOpts.headers) fetchOpts.headers = {};
   fetchOpts.headers['accept-encoding'] = 'gzip,deflate';
   const results = new Heap<Result>(compareResults);
+
+  const seen = new Set<string>();
+  let distance = 1;
+  let shortestDistance: number;
   do {
     let features: turf.Feature[] = await Promise.all([
       distance == 1 ? retrieveTile({ coords: tileCoords, metadata: metadata, url: opts.url, queue, fetchOpts }).catch(() => []) : [],
@@ -96,6 +101,12 @@ export async function search(opts: {
     for (const f of features) {
       let d: number;
       const geom = f.geometry;
+      if (opts.dedupe) {
+        const hash = JSON.stringify(f);
+        if (seen.has(hash))
+          continue;
+        seen.add(hash);
+      }
       if (geom.type === 'Point') {
         d = turf.distance(targetCoords, (geom as turf.Point).coordinates);
       } else {
