@@ -58,3 +58,11 @@ queryMVT.search({
     assert.closeTo(results[0].distance, 0.04, 0.1);
   })
 ```
+
+## CLI
+
+A stand-alone CLI version exists as well:
+
+```shell
+query-mvt 45.779 6.22 -f class=village
+```

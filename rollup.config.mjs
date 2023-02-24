@@ -1,6 +1,7 @@
 import typescript from '@rollup/plugin-typescript';
 import inject from '@rollup/plugin-inject';
 import terser from '@rollup/plugin-terser';
+import executable from 'rollup-plugin-executable';
 
 export default [
   {
@@ -41,6 +42,19 @@ export default [
     },
     plugins: [
       typescript()
+    ]
+  },
+  {
+    input: 'src/cli.ts',
+    output: {
+      format: 'cjs',
+      file: 'dist/cli.js',
+      sourcemap: true,
+      banner: '#!/usr/bin/env node'
+    },
+    plugins: [
+      typescript(),
+      executable()
     ]
   }
 ];
