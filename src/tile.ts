@@ -4,6 +4,7 @@ import * as turf from '@turf/turf';
 import proj4 from 'proj4';
 import { Queue } from 'async-await-queue';
 
+import './mvt-vector-tile.js';
 import { MVTMetadata } from './metadata';
 import { debug } from './debug';
 

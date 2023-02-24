@@ -22,5 +22,13 @@ module.exports = {
         quotes: ['error', 'single'],
         semi: ['error', 'always'],
         'mocha/no-exclusive-tests': 'error'
-    }
+    },
+    overrides: [
+        {
+            files: ['**/*.js'],
+            extends: [
+                'eslint:recommended'
+            ]
+        }
+    ]
 };
