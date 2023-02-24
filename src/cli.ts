@@ -91,17 +91,7 @@ import { acquire, MVTMetadata, search, constants } from '.';
     .help()
     .argv;
 
-  let metadata = await acquire(path.posix.join(argv.root, 'metadata.json'))
-    .catch(() => null) as MVTMetadata;
-  if (!argv.json) {
-    if (metadata) {
-      console.log('Loaded metadata.json');
-    } else {
-      metadata = {};
-      console.log('No metadata.json found');
-    }
-  }
-
+  let metadata: MVTMetadata = {};
   if (argv.crs)
     metadata.crs = argv.crs;
   if (argv.top)
@@ -112,6 +102,17 @@ import { acquire, MVTMetadata, search, constants } from '.';
     metadata.tile_dimension_zoom_0 = argv.dimension;
   if (argv.zoom)
     metadata.maxzoom = argv.zoom;
+
+  metadata = await acquire(path.posix.join(argv.root, 'metadata.json'))
+    .catch(() => null) as MVTMetadata;
+  if (!argv.json) {
+    if (metadata) {
+      console.log('Loaded metadata.json');
+    } else {
+      metadata = {};
+      console.log('No metadata.json found');
+    }
+  }
 
   const filter: (f: turf.Feature) => boolean | undefined = argv.filter ?
     (feature: turf.Feature) => {
