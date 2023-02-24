@@ -11,8 +11,6 @@ import * as constants from './constants';
 export * as constants from './constants';
 import { debug } from './debug';
 
-//useFetch;
-
 export type Result = {
   /**
    * Distance in km
@@ -27,10 +25,11 @@ const compareResults = (a: Result, b: Result) => b.distance - a.distance;
 
 /**
  * @param {string} url URL of a GDAL-style metadata.json
+ * @param {RequestInit} [fetchOpts] optional fetch options (AbortController, authorization headers...)
  * @returns {MVTMetadata}
  */
-export async function acquire(url: string): Promise<MVTMetadata> {
-  return fetch(url).then((data) => data.json()) as Promise<MVTMetadata>;
+export async function acquire(url: string, fetchOpts?: RequestInit): Promise<MVTMetadata> {
+  return fetch(url, fetchOpts).then((data) => data.json()) as Promise<MVTMetadata>;
 }
 
 /**
@@ -43,6 +42,8 @@ export async function acquire(url: string): Promise<MVTMetadata> {
  * @param {number} opts.maxFeatures optional number of features to return, @default 1
  * @param {number} opts.maxRadius optional maximum radius in km to search in, @default 10
  * @param {number} opts.filter optional filter function, will receive features one by one, must return keep (true) or discard (false)
+ * @param {RequestInit} [opts.fetchOpts] optional fetch options (AbortController, authorization headers...)
+ * 
  * @returns {turf.Feature}
  */
 export async function search(opts: {
@@ -54,6 +55,7 @@ export async function search(opts: {
   maxFeatures?: number;
   filter?: (feature: turf.Feature) => boolean,
   queue?: Queue;
+  fetchOpts?: RequestInit;
 }): Promise<Result[]> {
   const metadata: MVTMetadata = {
     tile_origin_upper_left_x:
@@ -79,11 +81,16 @@ export async function search(opts: {
   let distance = 1;
   let shortestDistance: number;
   const queue = opts.queue ?? new Queue(8, 0);
+  const fetchOpts: RequestInit = opts.fetchOpts ?? {
+    headers: {
+      'accept-encoding': 'gzip,deflate'
+    }
+  };
   const results = new Heap<Result>(compareResults);
   do {
     let features: turf.Feature[] = await Promise.all([
-      distance == 1 ? retrieveTile({ coords: tileCoords, metadata: metadata, url: opts.url, queue }).catch(() => []) : [],
-      retrieveNeighboringTiles({ coords: tileCoords, metadata: metadata, url: opts.url, distance, queue })
+      distance == 1 ? retrieveTile({ coords: tileCoords, metadata: metadata, url: opts.url, queue, fetchOpts }).catch(() => []) : [],
+      retrieveNeighboringTiles({ coords: tileCoords, metadata: metadata, url: opts.url, distance, queue, fetchOpts })
     ]).then(([first, next]) => [...first, ...next]);
     if (opts.filter)
       features = features.filter(opts.filter);

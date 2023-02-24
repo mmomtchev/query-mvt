@@ -7,8 +7,6 @@ import { Queue } from 'async-await-queue';
 import { MVTMetadata } from './metadata';
 import { debug } from './debug';
 
-//useFetch;
-
 declare module '@mapbox/vector-tile' {
   interface VectorTileFeature {
     toGeoJSON(x: number, y: number, z: number, project?: (xy: [number, number]) => [number, number]): GeoJSON.Feature;
@@ -87,16 +85,12 @@ export function retrieveTile(opts: {
   coords: [number, number];
   metadata: MVTMetadata;
   queue: Queue;
+  fetchOpts: RequestInit;
 }): Promise<turf.Feature[]> {
   const url = resolveUrl({ url: opts.url, coords: opts.coords, zoom: opts.metadata.maxzoom });
   debug(`Retrieving ${url}`);
   return new Promise((resolve, reject) =>
-    opts.queue.run(() =>
-      fetch(url, {
-        headers: {
-          'accept-encoding': 'gzip,deflate'
-        }
-      }))
+    opts.queue.run(() => fetch(url, opts.fetchOpts))
       .then((data) => {
         if (!data.ok) {
           throw new Error(`${url}: HTTP ${data.status} ${data.statusText}`);
@@ -149,6 +143,7 @@ export function retrieveNeighboringTiles(opts: {
   metadata: MVTMetadata;
   distance: number;
   queue: Queue;
+  fetchOpts: RequestInit;
 }): Promise<turf.Feature[]> {
   const tileCoords = getNeighboringTiles(opts);
   const tiles = [] as Promise<turf.Feature[]>[];
@@ -158,7 +153,8 @@ export function retrieveNeighboringTiles(opts: {
         url: opts.url,
         coords: coords,
         metadata: opts.metadata,
-        queue: opts.queue
+        queue: opts.queue,
+        fetchOpts: opts.fetchOpts
       }).catch(() => [] as turf.Feature[]));
   }
 
