@@ -13,6 +13,9 @@ import * as constants from './constants';
 export * as constants from './constants';
 import { debug } from './debug';
 
+/**
+ * @type
+ */
 export type Result = {
   /**
    * Distance in km
@@ -47,7 +50,7 @@ export async function acquire(url: string, fetchOpts?: RequestInit): Promise<MVT
  * @param {RequestInit} [opts.fetchOpts] optional fetch options (AbortController, authorization headers...)
  * @param {boolean} [opts.dedupe] dedupe the returned features (as the text will usually stretch across several tiles)
  * 
- * @returns {turf.Feature}
+ * @returns {Promise<Result[]>}
  */
 export async function search(opts: {
   url: string;
