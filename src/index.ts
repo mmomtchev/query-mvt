@@ -46,7 +46,7 @@ export async function acquire(url: string, fetchOpts?: RequestInit): Promise<MVT
  * @param {Queue} opts.queue optional shared Queue to be used for limiting concurrency, @default Queue(8,0)
  * @param {number} opts.maxFeatures optional number of features to return, @default 1
  * @param {number} opts.maxRadius optional maximum radius in km to search in, @default 10
- * @param {number} opts.filter optional filter function, will receive features one by one, must return keep (true) or discard (false)
+ * @param {(feature: turf.Feature) => boolean} opts.filter optional filter function, will receive features one by one, must return keep (true) or discard (false)
  * @param {RequestInit} [opts.fetchOpts] optional fetch options (AbortController, authorization headers...)
  * @param {boolean} [opts.dedupe] dedupe the returned features (as the text will usually stretch across several tiles)
  * 
@@ -96,16 +96,16 @@ export async function search(opts: {
   let distance = 1;
   let shortestDistance: number;
   do {
-    let features: turf.Feature[] = await Promise.all([
+    const features: turf.Feature[] = await Promise.all([
       distance == 1 ? retrieveTile({ coords: tileCoords, metadata: metadata, url: opts.url, queue, fetchOpts }).catch(() => []) : [],
       retrieveNeighboringTiles({ coords: tileCoords, metadata: metadata, url: opts.url, distance, queue, fetchOpts })
     ]).then(([first, next]) => [...first, ...next]);
-    if (opts.filter)
-      features = features.filter(opts.filter);
 
     for (const f of features) {
       let d: number;
       const geom = f.geometry;
+      if (opts.filter && !opts.filter(f))
+        continue;
       if (opts.dedupe) {
         const hash = Base64.stringify(md5(JSON.stringify(f)));
         if (seen.has(hash))

@@ -120,7 +120,7 @@ import { acquire, MVTMetadata, search, constants } from '.';
     }
   }
 
-  const filter: (f: turf.Feature) => boolean | undefined = argv.filter ?
+  const filter: ((f: turf.Feature) => boolean) | undefined = argv.filter ?
     (feature: turf.Feature) => {
       for (const flt of argv.filter as string[]) {
         const [key, value] = flt.split('=');
