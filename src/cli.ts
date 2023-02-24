@@ -91,13 +91,15 @@ import { acquire, MVTMetadata, search, constants } from '.';
     .help()
     .argv;
 
-  const metadata = await acquire(path.posix.join(argv.root, 'metadata.json'))
-    .catch(() => ({})) as MVTMetadata;
+  let metadata = await acquire(path.posix.join(argv.root, 'metadata.json'))
+    .catch(() => null) as MVTMetadata;
   if (!argv.json) {
-    if (metadata)
+    if (metadata) {
       console.log('Loaded metadata.json');
-    else
+    } else {
+      metadata = {};
       console.log('No metadata.json found');
+    }
   }
 
   if (argv.crs)
