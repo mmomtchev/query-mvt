@@ -49,6 +49,7 @@
     "@types/mocha": "^10.0.1",
     "@types/pbf": "^3.0.2",
     "@types/proj4": "^2.5.2",
+    "@types/yargs": "^17.0.22",
     "@typescript-eslint/eslint-plugin": "^5.53.0",
     "@typescript-eslint/parser": "^5.53.0",
     "chai": "^4.3.7",
@@ -68,7 +69,8 @@
     "heap-js": "^2.2.0",
     "node-fetch": "^2.6.9",
     "pbf": "^3.2.1",
-    "proj4": "^2.8.1"
+    "proj4": "^2.8.1",
+    "yargs": "^17.7.1"
   },
   "engines": {
     "node": ">=16"

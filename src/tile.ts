@@ -5,7 +5,7 @@ import proj4 from 'proj4';
 import { Queue } from 'async-await-queue';
 
 import { MVTMetadata } from './metadata';
-import { debug } from './debug.js';
+import { debug } from './debug';
 
 //useFetch;
 

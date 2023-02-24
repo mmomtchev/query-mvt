@@ -6,10 +6,10 @@ export { Queue } from 'async-await-queue';
 
 import { MVTMetadata } from './metadata';
 export { MVTMetadata } from './metadata';
-import { resolveTile, retrieveNeighboringTiles, retrieveTile, shortestDistanceInNeighboringTiles } from './tile.js';
-import * as constants from './constants.js';
-export * as constants from './constants.js';
-import { debug } from './debug.js';
+import { resolveTile, retrieveNeighboringTiles, retrieveTile, shortestDistanceInNeighboringTiles } from './tile';
+import * as constants from './constants';
+export * as constants from './constants';
+import { debug } from './debug';
 
 //useFetch;
 
