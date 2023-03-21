@@ -11,9 +11,9 @@
     "lint:fix": "eslint --fix src/* test/*",
     "c8": "node_modules/.bin/c8 mocha",
     "lcov": "node_modules/.bin/c8 report --reporter=text-lcov > coverage/tests.lcov",
-    "build": "rollup -c rollup.config.mjs && tsc --emitDeclarationOnly -d --declarationDir dist --esModuleInterop src/index.ts",
+    "prepare": "rollup -c rollup.config.mjs && tsc --emitDeclarationOnly -d --declarationDir dist --esModuleInterop src/index.ts",
     "doc": "documentation readme --section API src/index.ts",
-    "version": "npm run build && npm run doc && git add package.json README.md",
+    "version": "npm run prepare && npm run doc && git add package.json README.md",
     "test": "npm run lint && mocha"
   },
   "bin": {
