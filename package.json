@@ -62,7 +62,7 @@
     "@types/yargs": "^17.0.25",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
-    "chai": "^4.3.7",
+    "chai": "^4.3.10",
     "documentation": "^14.0.1",
     "eslint": "^8.49.0",
     "eslint-plugin-mocha": "^10.1.0",
