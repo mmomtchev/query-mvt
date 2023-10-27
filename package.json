@@ -51,7 +51,7 @@
   "homepage": "https://github.com/mmomtchev/query-mvt#readme",
   "devDependencies": {
     "@rollup/plugin-inject": "^5.0.4",
-    "@rollup/plugin-terser": "^0.4.3",
+    "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.4",
     "@types/chai": "^4.3.6",
     "@types/crypto-js": "^4.1.1",
