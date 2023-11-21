@@ -65,7 +65,7 @@
     "chai": "^4.3.10",
     "documentation": "^14.0.1",
     "eslint": "^8.51.0",
-    "eslint-plugin-mocha": "^10.1.0",
+    "eslint-plugin-mocha": "^10.2.0",
     "mocha": "^10.2.0",
     "rollup": "^3.29.4",
     "rollup-plugin-executable": "^1.6.3",
