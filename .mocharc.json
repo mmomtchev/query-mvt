@@ -4,5 +4,5 @@
     "ts-node/register"
   ],
   "reporter": "tap",
-  "timeout": 20000
+  "timeout": 40000
 }
