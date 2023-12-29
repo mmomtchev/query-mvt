@@ -70,7 +70,7 @@
     "rollup": "^3.29.4",
     "rollup-plugin-executable": "^1.6.3",
     "rollup-plugin-modify": "^3.0.0",
-    "ts-node": "^10.9.1",
+    "ts-node": "^10.9.2",
     "typescript": "^4.9.5"
   },
   "dependencies": {
