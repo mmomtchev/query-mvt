@@ -23,12 +23,12 @@
     "node": {
       "types": "./dist/index.d.ts",
       "import": "./dist/es6/index.mjs",
-      "default": "./dist/es6/index.mjs",
-      "require": "./dist/cjs/index.cjs"
+      "require": "./dist/cjs/index.cjs",
+      "default": "./dist/es6/index.mjs"
     },
     "browser": {
-      "import": "./dist/browser/index.js",
-      "types": "./dist/index.d.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/browser/index.js"
     }
   },
   "repository": {
