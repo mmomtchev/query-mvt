@@ -23,7 +23,7 @@ import { acquire, MVTMetadata, search, constants } from '.';
       alias: 'u'
     })
     .option('template', {
-      default: '{z}/{x}/{y}.pbf',
+      default: '{z}/{x}/{y}',
       describe: 'Template for tile numbering',
       alias: 'm'
     })
