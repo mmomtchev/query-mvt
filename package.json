@@ -1,6 +1,6 @@
 {
   "name": "query-mvt",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Query features from remote MVT tiles by location",
   "main": "dist/cjs/index.cjs",
   "module": "dist/es6/index.mjs",
