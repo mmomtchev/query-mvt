@@ -47,7 +47,7 @@ import * as queryMVT from 'query-mvt';
 // Configure manually the layer metadata
 // (EPSG:3857 with world coverage in this case)
 queryMVT.search({
-  url: 'https://www.qwant.com/maps/tiles/ozbasemap/{z}/{x}/{y}.pbf',
+  url: 'https://tiles.qwant.com/default/{z}/{x}/{y}',
   lon: 2.348942,
   lat: 48.853289,
   // You can filter the results
