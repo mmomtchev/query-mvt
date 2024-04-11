@@ -19,7 +19,7 @@ import { acquire, MVTMetadata, search, constants } from '.';
     })
     .option('root', {
       describe: 'Root URL',
-      default: 'https://www.qwant.com/maps/tiles/ozbasemap/',
+      default: 'https://tiles.qwant.com/default/',
       alias: 'u'
     })
     .option('template', {

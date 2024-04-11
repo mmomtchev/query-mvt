@@ -84,7 +84,7 @@ describe('search()', () => {
   // The proof I do not discriminate based on past actions of past CEOs
   it('EPSG:3857 w/ explicit metadata (Qwant)', (done) => {
     search({
-      url: 'https://www.qwant.com/maps/tiles/ozbasemap/{z}/{x}/{y}.pbf',
+      url: 'https://tiles.qwant.com/default/{z}/{x}/{y}',
       lon: 2.35586,
       lat: 48.83115,
       metadata: {
@@ -93,7 +93,8 @@ describe('search()', () => {
       }
     })
       .then((results) => {
-        assert.strictEqual(results[0].feature.properties['admin_level'], 10);
+        assert.isString(results[0].feature.properties.class);
+        assert.isString(results[0].feature.properties.qwant_id);
         assert.closeTo(results[0].distance, 0.03, 0.1);
         done();
       })
@@ -102,7 +103,7 @@ describe('search()', () => {
 
   it('search by class', (done) => {
     search({
-      url: 'https://www.qwant.com/maps/tiles/ozbasemap/{z}/{x}/{y}.pbf',
+      url: 'https://tiles.qwant.com/default/{z}/{x}/{y}',
       lon: 2.348942,
       lat: 48.853289,
       filter: (f) => f.properties['class'] === 'city',
@@ -123,7 +124,7 @@ describe('search()', () => {
 
   it('search across the antimeridian', (done) => {
     search({
-      url: 'https://www.qwant.com/maps/tiles/ozbasemap/{z}/{x}/{y}.pbf',
+      url: 'https://tiles.qwant.com/default/{z}/{x}/{y}',
       lon: 179.999999,
       lat: -16.160655,
       maxFeatures: 50,
@@ -143,7 +144,7 @@ describe('search()', () => {
 
   it('restrict search radius', (done) => {
     search({
-      url: 'https://www.qwant.com/maps/tiles/ozbasemap/{z}/{x}/{y}.pbf',
+      url: 'https://tiles.qwant.com/default/{z}/{x}/{y}',
       lon: 2.35586,
       lat: 48.83115,
       maxFeatures: 100,
@@ -154,7 +155,7 @@ describe('search()', () => {
       }
     })
       .then((results) => {
-        assert.lengthOf(results, 15);
+        assert.lengthOf(results, 42);
         done();
       })
       .catch((e) => done(e));
@@ -162,11 +163,11 @@ describe('search()', () => {
 
   it('dedupe identical features', (done) => {
     search({
-      url: 'https://www.qwant.com/maps/tiles/ozbasemap/{z}/{x}/{y}.pbf',
+      url: 'https://tiles.qwant.com/default/{z}/{x}/{y}',
       lon: 6.220432,
       lat: 45.779170,
       maxFeatures: 100,
-      filter: (f) => f.properties['rank'] === 11,
+      filter: (f) => f.properties['rank'] === 11 && f.properties['class'] === 'village',
       metadata: {
         ...constants.EPSG3857,
         maxzoom: 13,
@@ -175,7 +176,7 @@ describe('search()', () => {
     })
       .then((results) => {
         assert.strictEqual(results[0].feature.properties['name'], 'Doussard');
-        assert.strictEqual(results[1].feature.properties['name'], 'Lathuile');
+        assert.strictEqual(results[1].feature.properties['name'], 'Chevaline');
         done();
       })
       .catch((e) => done(e));
