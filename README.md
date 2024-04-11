@@ -1,6 +1,6 @@
 # query-mvt
 
-Query features nearest to a given point from a remote MVT vector tiles layer
+Query map features nearest to a given point from a remote MVT vector tiles layer
 
 [![License: ISC](https://img.shields.io/github/license/mmomtchev/query-mvt)](https://github.com/mmomtchev/query-mvt/blob/master/LICENSE)
 [![Node.js CI](https://github.com/mmomtchev/query-mvt/actions/workflows/node.js.yml/badge.svg)](https://github.com/mmomtchev/query-mvt/actions/workflows/node.js.yml)[![codecov](https://codecov.io/gh/mmomtchev/query-mvt/branch/main/graph/badge.svg?token=oT28J2XMYB)](https://codecov.io/gh/mmomtchev/query-mvt)
@@ -15,7 +15,7 @@ It works both in Node.js and in the browser. It supports all vector mapping serv
 npm i query-mvt
 ```
 
-Vector tile sets created by GDAL and a few other tools come with a de-facto standard `metadata.json` that allows `query-mvt` to automatically acquire all the needed parameters:
+Vector tile sets created by GDAL and a few other tools come with a de-facto standard `metadata.json` that allows `query-mvt` to automatically acquire all the needed parameters (such as map projects, tile grid and size, world bounds):
 
 ## with `metadata.json`
 
@@ -39,7 +39,7 @@ queryMVT.acquire('https://velivole.b-cdn.net/tiles/place/2/metadata.json')
 
 ## raw MVT tiles
 
-Most commercial public mapping services such as Qwant do not have a `metadata.json` but tend to use the same `EPSG:3857` projection and world bounds:
+Most commercial public mapping services such as Qwant do not have a `metadata.json` but tend to use the same `EPSG:3857` projection (aka Web Mercator) and world bounds:
 
 ```js
 import * as queryMVT from 'query-mvt';
@@ -68,6 +68,7 @@ queryMVT.search({
 A stand-alone CLI version exists as well:
 
 ```shell
+# Query the nearest village near 45.779° N : 6.22° E
 query-mvt 45.779 6.22 -f class=village
 ```
 
