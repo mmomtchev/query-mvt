@@ -9,6 +9,10 @@ updates:
       eslint:
         patterns:
         - "*eslint*"
+      mapbox:
+        patterns:
+        - "@mapbox*"
+        - "pbf"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
