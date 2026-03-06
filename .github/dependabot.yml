@@ -11,15 +11,11 @@ updates:
       eslint:
         patterns:
         - "*eslint*"
-        exclude-patterns:
         - "*typescript*"
       mapbox:
         patterns:
         - "@mapbox*"
         - "pbf"
-      typescript:
-        patterns:
-        - "*typescript*"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
