@@ -7,8 +7,8 @@
   "browser": "dist/browser/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "lint": "eslint src/* test/*",
-    "lint:fix": "eslint --fix src/* test/*",
+    "lint": "npx eslint",
+    "lint:fix": "npx eslint --fix src/* test/*",
     "c8": "node_modules/.bin/c8 mocha",
     "lcov": "node_modules/.bin/c8 report --reporter=text-lcov > coverage/tests.lcov",
     "prepare": "rollup -c rollup.config.mjs && tsc --emitDeclarationOnly -d --declarationDir dist --esModuleInterop src/index.ts",
@@ -50,6 +50,8 @@
   },
   "homepage": "https://github.com/mmomtchev/query-mvt#readme",
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.4",
+    "@eslint/js": "^10.0.1",
     "@rollup/plugin-inject": "^5.0.5",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^12.1.0",
@@ -67,6 +69,7 @@
     "documentation": "^14.0.1",
     "eslint": "^10.0.0",
     "eslint-plugin-mocha": "^10.2.0",
+    "globals": "^17.4.0",
     "mocha": "^11.0.1",
     "rollup": "^4.12.0",
     "rollup-plugin-executable": "^1.6.3",
