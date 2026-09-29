@@ -1,5 +1,5 @@
 import { VectorTile } from '@mapbox/vector-tile';
-import Protobuf from 'pbf';
+import { PbfReader } from 'pbf';
 import * as turf from '@turf/turf';
 import proj4 from 'proj4';
 import { Queue } from 'async-await-queue';
@@ -100,7 +100,7 @@ export function retrieveTile(opts: {
       })
       .then((data) => data.arrayBuffer())
       .then((data) => {
-        const tile = new VectorTile(new Protobuf(data));
+        const tile = new VectorTile(new PbfReader(data));
         const features = getTileFeatures(tile, { coords: opts.coords, metadata: opts.metadata });
         debug(`${url} contains ${features.length} features`);
         resolve(features);
